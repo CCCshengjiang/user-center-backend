@@ -45,6 +45,16 @@ public class UserController {
         return userService.userRegister(userAccount, userPassword, checkPassword);
     }
 
+    @GetMapping("/current")
+    public User getCurrentUser(HttpServletRequest request) {
+        User curUser = (User) request.getSession().getAttribute(USER_LOGIN_STATUS);
+        if (curUser == null) {
+            return null;
+        }
+        long userId = curUser.getId();
+        return userService.getById(userId);
+    }
+
     @PostMapping("/login")
     public User UserLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest httpServletRequest){
         if (userLoginRequest == null) {
