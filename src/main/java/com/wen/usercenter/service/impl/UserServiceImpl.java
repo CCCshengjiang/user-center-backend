@@ -2,6 +2,8 @@ package com.wen.usercenter.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.wen.usercenter.common.ErrorCode;
+import com.wen.usercenter.exception.BusinessException;
 import com.wen.usercenter.model.domain.User;
 import com.wen.usercenter.service.UserService;
 import com.wen.usercenter.mapper.UserMapper;
@@ -34,31 +36,40 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     private static final String SALT = "wen";
 
     @Override
-    public long userRegister(String userAccount, String userPassword, String checkPassword) {
+    public long userRegister(String userAccount, String userPassword, String checkPassword, String idCode) {
         // 账号、密码以及确认密码的长度校验
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
-            // TODO 返回值修改为自定义异常
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_NULL_ERROR, "数据为空");
+        }
+        if (idCode.length() > 7) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "编号太长");
         }
         if (userAccount.length() < 4) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号太短");
         }
         if (userPassword.length() < 8 || checkPassword.length() < 8) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "密码太短");
         }
         // 账号不能包含特殊字符
         if (!userAccount.matches("^[0-9a-zA-Z]{4,}$")) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号有特殊字符");
         }
         if (!userPassword.equals(checkPassword)) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "两次输入密码不一致");
         }
         // 账号重复校验
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_account", userAccount);
         long count = this.count(queryWrapper);
         if (count > 0) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号重复");
+        }
+        // 编号重复校验
+        queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id_code", userAccount);
+        count = this.count(queryWrapper);
+        if (count > 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "编号重复");
         }
         // 密码加密
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
@@ -66,9 +77,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         User user = new User();
         user.setUserAccount(userAccount);
         user.setUserPassword(encryptPassword);
+        user.setIdCode(idCode);
         boolean savResult = this.save(user);
         if (!savResult) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "存储错误");
         }
         return user.getId();
     }
@@ -120,9 +132,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         safetyUser.setEmail(originUser.getEmail());
         safetyUser.setUserStatus(originUser.getUserStatus());
         safetyUser.setUserRole(originUser.getUserRole());
+        safetyUser.setIdCode(originUser.getIdCode());
         safetyUser.setCreateTime(originUser.getCreateTime());
         safetyUser.setUpdateTime(originUser.getUpdateTime());
         return safetyUser;
+    }
+
+    @Override
+    public int userLogout(HttpServletRequest request) {
+        request.getSession().removeAttribute(USER_LOGIN_STATUS);
+        return 1;
     }
 }
 

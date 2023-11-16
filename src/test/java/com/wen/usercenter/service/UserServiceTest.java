@@ -40,10 +40,11 @@ class UserServiceTest {
 
     @Test
     void userRegister() {
-        String userAccount = "，。asd";
+        String userAccount = "chenwenbo5";
         String userPassword = "12345678";
         String checkPassword = "12345678";
-        long result = userService.userRegister(userAccount, userPassword, checkPassword);
+        String idCode = "123";
+        long result = userService.userRegister(userAccount, userPassword, checkPassword, idCode);
         Assertions.assertEquals(-1, result);
     }
 }
