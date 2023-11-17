@@ -42,7 +42,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             throw new BusinessException(ErrorCode.PARAMS_NULL_ERROR, "数据为空");
         }
         if (idCode.length() > 7) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "编号太长");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "编号过长");
         }
         if (userAccount.length() < 4) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号太短");
@@ -89,7 +89,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public User userLogin(String userAccount, String userPassword, HttpServletRequest httpServletRequest) {
         // 账号、密码的长度校验
         if (StringUtils.isAnyBlank(userAccount, userPassword)) {
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "存储错误");
         }
         if (userAccount.length() < 4 || userPassword.length() < 8) {
             return null;
@@ -108,7 +108,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         // 用户不存在
         if (user == null) {
             log.info("user login failed, userAccount cannot match userPassword!");
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号或密码错误");
         }
         // 用户信息脱敏
         User safetyUser = getSafetyUser(user);

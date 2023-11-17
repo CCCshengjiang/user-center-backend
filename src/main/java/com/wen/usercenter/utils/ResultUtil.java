@@ -17,7 +17,7 @@ public class ResultUtil {
      * @param <T>
      */
     public static <T> BaseResponse<T> success(T data) {
-        return new BaseResponse<>(200, data, "OK");
+        return new BaseResponse<>(20000, data, "OK");
     }
 
     /**
