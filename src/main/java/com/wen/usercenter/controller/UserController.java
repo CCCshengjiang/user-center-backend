@@ -28,6 +28,7 @@ import static com.wen.usercenter.constant.UserConstant.USER_LOGIN_STATUS;
  */
 @RestController
 @RequestMapping("/user")
+@CrossOrigin(origins = {"http://localhost:8000"},allowCredentials = "true")
 public class UserController {
 
     @Resource
@@ -73,6 +74,7 @@ public class UserController {
         User result = userService.userLogin(userAccount, userPassword, httpServletRequest);
         return ResultUtil.success(result);
     }
+
 
     @PostMapping("/logout")
     public BaseResponse<Integer> UserLogout(HttpServletRequest request){
