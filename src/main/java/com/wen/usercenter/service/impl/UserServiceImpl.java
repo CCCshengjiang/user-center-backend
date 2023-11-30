@@ -78,6 +78,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         user.setUserAccount(userAccount);
         user.setUserPassword(encryptPassword);
         user.setIdCode(idCode);
+        user.setAvatarUrl("https://static.nowcoder.com/head/1photo.jpg");
         boolean savResult = this.save(user);
         if (!savResult) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "存储错误");

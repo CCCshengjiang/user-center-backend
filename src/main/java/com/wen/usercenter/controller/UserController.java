@@ -28,7 +28,7 @@ import static com.wen.usercenter.constant.UserConstant.USER_LOGIN_STATUS;
  */
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = {"http://localhost:8000"},allowCredentials = "true")
+
 public class UserController {
 
     @Resource
