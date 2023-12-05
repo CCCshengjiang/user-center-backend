@@ -41,7 +41,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
             throw new BusinessException(ErrorCode.PARAMS_NULL_ERROR, "数据为空");
         }
-        if (idCode.length() > 7) {
+        if (idCode.length() > 8) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "编号过长");
         }
         if (userAccount.length() < 4) {
