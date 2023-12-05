@@ -78,7 +78,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         user.setUserAccount(userAccount);
         user.setUserPassword(encryptPassword);
         user.setIdCode(idCode);
-        user.setAvatarUrl("https://static.nowcoder.com/head/1photo.jpg");
+        // 后端设置默认用户名就是账号（前端没传递）
+        user.setUsername(userAccount);
         boolean savResult = this.save(user);
         if (!savResult) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "存储错误");
