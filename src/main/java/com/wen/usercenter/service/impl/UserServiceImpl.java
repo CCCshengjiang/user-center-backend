@@ -80,6 +80,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         user.setIdCode(idCode);
         // 后端设置默认用户名就是账号（前端没传递）
         user.setUsername(userAccount);
+        user.setAvatarUrl("https://cravatar.cn/avatar/1d6e25251cd7f27143014de4eeed28d5?s=32&d=wavatar&f=y&r=g");
         boolean savResult = this.save(user);
         if (!savResult) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "存储错误");
