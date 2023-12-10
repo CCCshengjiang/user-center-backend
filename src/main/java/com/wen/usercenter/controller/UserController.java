@@ -28,7 +28,6 @@ import static com.wen.usercenter.constant.UserConstant.USER_LOGIN_STATUS;
  */
 @RestController
 @RequestMapping("/user")
-
 public class UserController {
 
     @Resource
