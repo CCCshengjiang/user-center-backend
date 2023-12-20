@@ -50,14 +50,63 @@
 
 
 
-# 后端技术栈
+# 技术选型
 
-1. SpringBoot整合Spring、SpringMVC、Mybatis，版本：3.0+
-2. Mybatis-plus自动生成代码
-3. 数据库：MySQL，版本：8.0+
-4. Java版本：17.0+
+前端：
+
+- HTML+CSS+JavaScript 三件套
+- React 开发框架
+- 组件库 Ant Design 
+- Umi 开发框架
+- Umi Request 开发框架
+- Ant Design Pro
+
+
+后端：
+
+- java
+- spring（依赖注入框架，帮助你管理 Java 对象，集成一些其他的内容）
+- springmvc（web 框架，提供接口访问、restful接口等能力）
+- mybatis（Java 操作数据库的框架，持久层框架，对 jdbc 的封装）
+- mybatis-plus（对 mybatis 的增强，不用写 sql 也能实现增删改查）
+- springboot（**快速启动** / 快速集成项目。不用自己管理 spring 配置，不用自己整合各种框架）
+- junit 单元测试库
+- mysql 数据库
 
 
 
+# 项目启动
 
+## 前端
 
+（需要下载node.js，npm或yarn，文档末尾《知识补充》有相关介绍和下载安装教程）
+
+环境要求：Node.js 版本推荐16-17
+
+1.使用开发工具（VsCode或WebStorm等）打开前端项目文件
+
+2.终端输入执行以下命令：
+
+安装依赖：
+
+```
+npm install
+```
+
+启动：
+
+```
+npm start
+```
+
+部署（需要将项目部署到服务器中执行）：
+
+```
+npm build
+```
+
+执行命令后会得到 dist 目录，可以放到自己的 web 服务器指定的路径；也可以使用 Docker 容器部署，将 dist、Dockerfile、docker 目录（文件）一起打包即可。
+
+## 后端
+
+创建数据库表，修改配置文件中的数据库配置，启动项目。
