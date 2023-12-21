@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.wen.usercenter.common.BaseResponse;
 import com.wen.usercenter.common.ErrorCode;
 import com.wen.usercenter.exception.BusinessException;
+import com.wen.usercenter.model.DTO.UserSearchDTO;
 import com.wen.usercenter.model.domain.User;
 import com.wen.usercenter.model.domain.request.UserLoginRequest;
 import com.wen.usercenter.model.domain.request.UserRegisterRequest;
@@ -13,6 +14,7 @@ import com.wen.usercenter.utils.ResultUtil;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -80,19 +82,52 @@ public class UserController {
         if (request == null) {
             return ResultUtil.error(ErrorCode.PARAMS_NULL_ERROR);
         }
+
         int result = userService.userLogout(request);
         return ResultUtil.success(result);
     }
 
     @GetMapping("/search")
-    public BaseResponse<List<User>> searchUsers(String username, HttpServletRequest request) {
+    public BaseResponse<List<User>> searchUsers(UserSearchDTO userSearchDTO, HttpServletRequest request) {
+        //判断是否是管理员
         if (!isAdmin(request)) {
             return ResultUtil.error(ErrorCode.NOT_AUTH);
         }
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        if (StringUtils.isNotBlank(username)) {
-            queryWrapper.like("username", username);
+        User userQuery = new User();
+        if (userSearchDTO != null) {
+            BeanUtils.copyProperties(userSearchDTO, userQuery);
         }
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        if (userSearchDTO != null) {
+            if (userSearchDTO.getId() != null) {
+                queryWrapper.eq("id", userSearchDTO.getId());
+            }
+            if (userSearchDTO.getUserRole() != null) {
+                queryWrapper.eq("user_role", userSearchDTO.getUserRole());
+            }
+            if (userSearchDTO.getGender() != null) {
+                queryWrapper.eq("gender", userSearchDTO.getGender());
+            }
+            if (userSearchDTO.getUserStatus() != null) {
+                queryWrapper.eq("user_status", userSearchDTO.getUserStatus());
+            }
+            if (StringUtils.isNotBlank(userSearchDTO.getUsername())) {
+                queryWrapper.like("username", userSearchDTO.getUsername());
+            }
+            if (StringUtils.isNotBlank(userSearchDTO.getUserAccount())) {
+                queryWrapper.like("user_account", userSearchDTO.getUserAccount());
+            }
+            if (StringUtils.isNotBlank(userSearchDTO.getEmail())) {
+                queryWrapper.like("email", userSearchDTO.getEmail());
+            }
+            if (StringUtils.isNotBlank(userSearchDTO.getIdCode())) {
+                queryWrapper.eq("id_code", userSearchDTO.getIdCode());
+            }
+            if (StringUtils.isNotBlank(userSearchDTO.getPhone())) {
+                queryWrapper.like("phone", userSearchDTO.getPhone());
+            }
+        }
+        // 添加其他字段的判断逻辑
         List<User> userList = userService.list(queryWrapper);
         List<User> result = userList.stream().map(user -> userService.getSafetyUser(user)).collect(Collectors.toList());
         return ResultUtil.success(result);
