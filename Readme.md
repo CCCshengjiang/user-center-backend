@@ -110,3 +110,15 @@ npm build
 ## 后端
 
 创建数据库表，修改配置文件中的数据库配置，启动项目。
+
+
+
+# 项目图片
+
+![image-20231221230748071](https://gitee.com/CCCshengjiang/blog-img/raw/master/image/202312212307184.png)
+
+![image-20231221230822379](https://gitee.com/CCCshengjiang/blog-img/raw/master/image/202312212308482.png)
+
+![image-20231221231111564](https://gitee.com/CCCshengjiang/blog-img/raw/master/image/202312212311658.png)
+
+![image-20231221231030907](https://gitee.com/CCCshengjiang/blog-img/raw/master/image/202312212310997.png)
