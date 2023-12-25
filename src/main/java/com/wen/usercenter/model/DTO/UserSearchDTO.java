@@ -2,8 +2,10 @@ package com.wen.usercenter.model.DTO;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class UserSearchDTO {
+public class UserSearchDTO{
     private Integer id;
     private Integer userRole;
     private Integer gender;
@@ -13,4 +15,5 @@ public class UserSearchDTO {
     private String userAccount;
     private String phone;
     private String email;
+
 }
