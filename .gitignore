@@ -13,6 +13,9 @@ target/
 .springBeans
 .sts4-cache
 
+### prod
+application-prod.yml
+
 ### IntelliJ IDEA ###
 .idea
 *.iws

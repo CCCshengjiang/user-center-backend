@@ -4,16 +4,18 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wen.usercenter.common.ErrorCode;
 import com.wen.usercenter.exception.BusinessException;
+import com.wen.usercenter.model.DTO.PasswordUpdateDTO;
 import com.wen.usercenter.model.domain.User;
 import com.wen.usercenter.service.UserService;
 import com.wen.usercenter.mapper.UserMapper;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
-import com.wen.usercenter.constant.UserConstant;
 
 import static com.wen.usercenter.constant.UserConstant.USER_LOGIN_STATUS;
 
@@ -66,7 +68,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         // 编号重复校验
         queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("id_code", userAccount);
+        queryWrapper.eq("id_code", idCode);
         count = this.count(queryWrapper);
         if (count > 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "编号重复");
@@ -80,7 +82,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         user.setIdCode(idCode);
         // 后端设置默认用户名就是账号（前端没传递）
         user.setUsername(userAccount);
-        user.setAvatarUrl("https://cravatar.cn/avatar/1d6e25251cd7f27143014de4eeed28d5?s=32&d=wavatar&f=y&r=g");
+        user.setAvatarUrl("https://pic1.zhimg.com/80/v2-c8586e136574ebcbdc8ac5464cb36ff4_720w.webp");
         boolean savResult = this.save(user);
         if (!savResult) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "存储错误");
@@ -121,6 +123,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         return safetyUser;
     }
 
+    @Override
     public User getSafetyUser(User originUser) {
         if (originUser == null) {
             return null;
@@ -162,6 +165,69 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             throw new BusinessException(ErrorCode.NOT_LOGIN, "未登录");
         }
         return currentUser;
+    }
+
+    @Override
+    public QueryWrapper<User> searchUsers(User userQuery) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        if (userQuery != null) {
+            if (userQuery.getId() != null) {
+                queryWrapper.eq("id", userQuery.getId());
+            }
+            if (userQuery.getUserRole() != null) {
+                queryWrapper.eq("user_role", userQuery.getUserRole());
+            }
+            if (userQuery.getGender() != null) {
+                queryWrapper.eq("gender", userQuery.getGender());
+            }
+            if (userQuery.getUserStatus() != null) {
+                queryWrapper.eq("user_status", userQuery.getUserStatus());
+            }
+            if (StringUtils.isNotBlank(userQuery.getUsername())) {
+                queryWrapper.like("username", userQuery.getUsername());
+            }
+            if (StringUtils.isNotBlank(userQuery.getUserAccount())) {
+                queryWrapper.like("user_account", userQuery.getUserAccount());
+            }
+            if (StringUtils.isNotBlank(userQuery.getEmail())) {
+                queryWrapper.like("email", userQuery.getEmail());
+            }
+            if (StringUtils.isNotBlank(userQuery.getIdCode())) {
+                queryWrapper.eq("id_code", userQuery.getIdCode());
+            }
+            if (StringUtils.isNotBlank(userQuery.getPhone())) {
+                queryWrapper.like("phone", userQuery.getPhone());
+            }
+        }
+        return queryWrapper;
+    }
+
+    @Override
+    public boolean updateUserPassword(PasswordUpdateDTO passwordUpdateDTO, HttpServletRequest request) {
+        if (passwordUpdateDTO == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "前端没有密码传递进来");
+        }
+        User loginUser = getLoginUser(request);
+        Long userId = loginUser.getId();
+        if (userId == null || userId < 0) {
+            throw new BusinessException(ErrorCode.PARAMS_NULL_ERROR, "不存在该用户");
+        }
+        String encryptedOldPassword = DigestUtils.md5DigestAsHex((SALT + passwordUpdateDTO.getUserPassword()).getBytes());
+        if (!loginUser.getUserPassword().equals(encryptedOldPassword)) {
+            throw new BusinessException(ErrorCode.INVALID_PASSWORD_ERROR, "用户原本密码输入错误");
+        }
+
+        User user = new User();
+        BeanUtils.copyProperties(passwordUpdateDTO, user);
+        user.setId(loginUser.getId());
+
+        // 使用 MD5 加密新密码
+        String encryptedNewPassword = DigestUtils.md5DigestAsHex((SALT + passwordUpdateDTO.getNewPassword()).getBytes());
+        user.setUserPassword(encryptedNewPassword);
+        if (encryptedNewPassword.equals(passwordUpdateDTO.getUserPassword())) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "修改密码不能相同");
+        }
+        return updateById(user);
     }
 }
 

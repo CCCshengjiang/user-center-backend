@@ -1,5 +1,7 @@
 package com.wen.usercenter.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.wen.usercenter.model.DTO.PasswordUpdateDTO;
 import com.wen.usercenter.model.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,4 +49,8 @@ public interface UserService extends IService<User> {
     int userLogout(HttpServletRequest request);
 
     User getLoginUser(HttpServletRequest request);
+
+    QueryWrapper<User> searchUsers(User userQuery);
+
+    boolean updateUserPassword(PasswordUpdateDTO passwordUpdateDTO, HttpServletRequest request);
 }
