@@ -1,6 +1,7 @@
 package com.wen.usercenter.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.injector.methods.SelectById;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wen.usercenter.common.ErrorCode;
 import com.wen.usercenter.exception.BusinessException;

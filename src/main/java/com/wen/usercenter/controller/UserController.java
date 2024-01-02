@@ -6,6 +6,7 @@ import com.wen.usercenter.common.BaseResponse;
 import com.wen.usercenter.common.ErrorCode;
 import com.wen.usercenter.exception.BusinessException;
 import com.wen.usercenter.model.DTO.PasswordUpdateDTO;
+import com.wen.usercenter.model.DTO.UserDeleteDTO;
 import com.wen.usercenter.model.DTO.UserSearchDTO;
 import com.wen.usercenter.model.DTO.UserUpdateDTO;
 import com.wen.usercenter.model.domain.User;
@@ -62,7 +63,9 @@ public class UserController {
             return ResultUtil.error(PARAMS_NULL_ERROR);
         }
         long userId = curUser.getId();
-        User result = userService.getById(userId);
+        User user = userService.getById(userId);
+        //数据脱敏
+        User result = userService.getSafetyUser(user);
         return ResultUtil.success(result);
     }
 
@@ -118,19 +121,16 @@ public class UserController {
     }
 
     @PostMapping("/delete")
-    public BaseResponse<Boolean> deleteUser(@RequestBody long id, HttpServletRequest request) {
+    public BaseResponse<Boolean> deleteUser(@RequestBody UserDeleteDTO userDeleteDTO, HttpServletRequest request) {
         if (!isAdmin(request)) {
             return ResultUtil.error(PARAMS_NULL_ERROR);
         }
-        if (id <= 0) {
-            return ResultUtil.error(PARAMS_NULL_ERROR);
-        }
-        boolean result = userService.removeById(id);
+        boolean result = userService.removeById(userDeleteDTO.getId());
         return ResultUtil.success(result);
     }
 
     /**
-     * 修改用户信息
+     * 普通用户修改信息
      *
      * @param request
      * @return
@@ -149,6 +149,25 @@ public class UserController {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR);
         }
         return ResultUtil.success(loginUser);
+    }
+
+    /**
+     * 管理员修改用户信息
+     *
+     * @param request
+     * @return
+     */
+    @PostMapping("/adminUpdateUser")
+    public BaseResponse<Boolean> adminUpdateUser(@RequestBody UserUpdateDTO userUpdateDTO, HttpServletRequest request) {
+        if (!isAdmin(request)) {
+            throw new BusinessException(ErrorCode.NOT_AUTH, "无权限");
+        }
+        if (userUpdateDTO == null || userUpdateDTO.getId() == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User user = new User();
+        BeanUtils.copyProperties(userUpdateDTO, user);
+        return ResultUtil.success(userService.updateById(user));
     }
 
     /**
